@@ -129,4 +129,4 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-./hive-multisig-bot-data/
+hive-multisig-bot-data/
