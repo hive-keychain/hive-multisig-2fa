@@ -30,22 +30,21 @@ const setupRoutines = async () => {
   Logger.technical("Setting up routines");
   await DataUtils.initStorage();
   await BlockParserModule.initializeValues();
-  BlockParserModule.start();
+  if (await SocketIoLogic.init()) {
+    BlockParserModule.start();
+  } else console.log("could not connect");
 };
 
 const startServer = (app: Express) => {
   if (!process.env.DEV) {
-    https.createServer({}, app).listen(Config.port.server, () => {
-      Logger.technical(`Https Server running on port ${Config.port.server}`);
+    https.createServer({}, app).listen(Config.port, () => {
+      Logger.technical(`Https Server running on port ${Config.port}`);
     });
   } else {
     const httpServer = createServer(app);
-    SocketIoLogic.init();
 
-    httpServer.listen(Config.port.server, () => {
-      Logger.technical(
-        `Running on port ${Config.port.server}, socket.io on port ${Config.port.socketIo}`
-      );
+    httpServer.listen(Config.port, () => {
+      Logger.technical(`Running on port ${Config.port}`);
     });
   }
 };

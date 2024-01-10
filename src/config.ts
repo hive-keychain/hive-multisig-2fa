@@ -3,10 +3,11 @@ import path from "path";
 require("dotenv").config();
 
 export const Config = {
-  port: {
-    server: process.env.PORT || 5001,
-    socketIo: process.env.SOCKET_PORT || 5001,
-  },
+  port: process.env.PORT || 5001,
+  multisigServer:
+    process.env.DEV === "true"
+      ? "http://localhost:5000"
+      : "https://api-multisig.hive-keychain.com",
   logger: {
     folder: path.join(__dirname, "..", "logs"),
     file: "multisig-bot-%DATE%.log",
@@ -25,5 +26,9 @@ export const Config = {
   },
   bot: {
     account: process.env.BOT_ACCOUNT_NAME,
+    activeKey: process.env.BOT_ACTIVE_KEY,
+    activePubKey: process.env.BOT_ACTIVE_PUB_KEY,
+    postingKey: process.env.BOT_POSTING_KEY,
+    postingPubKey: process.env.BOT_POSTING_PUB_KEY,
   },
 };
