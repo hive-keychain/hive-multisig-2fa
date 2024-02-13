@@ -6,6 +6,8 @@ import { createServer } from "http";
 import https from "https";
 import { BlockParserModule } from "./block-parser/block-parser.module";
 import { Config } from "./config";
+import { MultisigBotDataSource } from "./database/data-source";
+import { DatabaseModule } from "./database/database.module";
 import { SocketIoLogic } from "./socket-io.logic";
 import { DataUtils } from "./utils/data.utils";
 require("dotenv").config();
@@ -28,6 +30,7 @@ const setupRoutes = (app: Express) => {
 
 const setupRoutines = async () => {
   Logger.technical("Setting up routines");
+  await DatabaseModule.initDatabaseConnection(MultisigBotDataSource);
   await DataUtils.initStorage();
   await BlockParserModule.initializeValues();
   if (await SocketIoLogic.init()) {
