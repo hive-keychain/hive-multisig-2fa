@@ -1,9 +1,11 @@
-import { SignedBlock, Transaction } from "@hiveio/dhive";
+import { CustomJsonOperation, SignedBlock, Transaction } from "@hiveio/dhive";
 import Logger from "hive-keychain-commons/lib/logger/logger";
 
+import { BotConfigurationLogic } from "../bot-configuration/bot-configuration.logic";
 import { Config } from "../config";
 import { BlockchainUtils } from "../utils/blockchain.utils";
 import { DataUtils, LayerOneBlockInfo } from "../utils/data.utils";
+import { ConfigurationOperations } from "./block-parser.interface";
 
 let averageDownloadTime = 0;
 let averageProcessTime = 0;
@@ -127,7 +129,28 @@ const processTransaction = async (
   transaction: Transaction,
   block: SignedBlock,
   blockNumber: number
-) => {};
+) => {
+  for (const op of transaction.operations) {
+    if (op[0] === "custom_json") {
+      const customJson = op[1] as CustomJsonOperation[1];
+      switch (customJson.id) {
+        case ConfigurationOperations.SET_TWO_FA_ID: {
+          console.log(customJson);
+          BotConfigurationLogic.set2FAId(
+            customJson.required_auths[0],
+            JSON.parse(customJson.json)
+          );
+          break;
+        }
+        case ConfigurationOperations.SET_GLOBAL_CONFIG: {
+          break;
+        }
+        default:
+          return;
+      }
+    }
+  }
+};
 
 const calculateDelay = async () => {
   const lastBlockNumber = await BlockchainUtils.getCurrentBlockNumber();

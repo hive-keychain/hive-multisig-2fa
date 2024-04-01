@@ -5,6 +5,10 @@ const getRepo = () => {
   return DatabaseModule.getDatabase().getRepository(OperationCriteria);
 };
 
+const create = async (criteria: Partial<OperationCriteria>) => {
+  await getRepo().save(criteria);
+};
+
 const update = async () => {};
 
-export const OperationCriteriaRepository = {};
+export const OperationCriteriaRepository = { create };

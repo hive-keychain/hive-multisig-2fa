@@ -19,6 +19,9 @@ export class AccountConfiguration {
   @Column()
   use2FAByDefault: boolean;
 
+  @Column()
+  twoFAId: string;
+
   @CreateDateColumn({
     type: "timestamp",
     default: () => "CURRENT_TIMESTAMP(6)",

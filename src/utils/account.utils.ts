@@ -22,6 +22,12 @@ const verifyKey = async (
   return false;
 };
 
+const getExtendAccount = async (username: string) => {
+  const accounts = await HiveUtils.getClient().database.getAccounts([username]);
+  return accounts[0];
+};
+
 export const AccountUtils = {
   verifyKey,
+  getExtendAccount,
 };

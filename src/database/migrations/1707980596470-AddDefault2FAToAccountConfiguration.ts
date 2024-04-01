@@ -12,6 +12,13 @@ export class AddDefault2FAToAccountConfiguration1707980596470
         default: true,
       })
     );
+    await queryRunner.addColumn(
+      "account-configuration",
+      new TableColumn({
+        name: "twoFAId",
+        type: "varchar",
+      })
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {}

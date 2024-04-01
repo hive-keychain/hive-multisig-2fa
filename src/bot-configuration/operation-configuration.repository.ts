@@ -5,6 +5,10 @@ const getRepo = () => {
   return DatabaseModule.getDatabase().getRepository(OperationConfiguration);
 };
 
+const create = async (config: Partial<OperationConfiguration>) => {
+  await getRepo().save(config);
+};
+
 const update = async () => {};
 
-export const OperationConfigurationRepository = {};
+export const OperationConfigurationRepository = { create };

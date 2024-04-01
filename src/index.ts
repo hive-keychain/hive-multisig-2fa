@@ -18,6 +18,7 @@ const initServerRoutine = async () => {
   const app = express();
   Logger.initLogger(Config.logger, process.env.NODE_ENV);
   setupRoutes(app);
+  // await BotConfigurationUtils.initConfigIfNecessary();
   await setupRoutines();
   startServer(app);
 };
