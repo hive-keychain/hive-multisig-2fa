@@ -1,4 +1,5 @@
-import { Client } from "@hiveio/dhive";
+import { Client, Transaction } from "@hiveio/dhive";
+import { Transaction as HiveTransaction, PrivateKey } from "hive-tx";
 const signature = require("@hiveio/hive-js/lib/auth/ecc");
 
 let hiveClient: Client;
@@ -39,7 +40,19 @@ const signMessage = (message: string, privateKey: string) => {
   return signature.Signature.signBuffer(buf, privateKey).toHex();
 };
 
+const signTransaction = async (tx: Transaction, key: string) => {
+  const hiveTransaction = new HiveTransaction(tx);
+
+  try {
+    const privateKey = PrivateKey.fromString(key!.toString());
+    return hiveTransaction.sign(privateKey);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 export const HiveUtils = {
   getClient,
   signMessage,
+  signTransaction,
 };

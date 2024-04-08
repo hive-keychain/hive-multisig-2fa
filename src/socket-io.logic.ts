@@ -1,11 +1,17 @@
+import { KeychainKeyTypes } from "hive-keychain-commons";
 import Logger from "hive-keychain-commons/lib/logger/logger";
+import { authenticator } from "otplib";
 import { Socket, io } from "socket.io-client";
+import { BotConfigurationLogic } from "./bot-configuration/bot-configuration.logic";
 import { Config } from "./config";
 import {
+  ISignatureRequest,
+  RequestSignatureSigner,
   SignerConnectMessage,
   SocketMessageCommand,
 } from "./socket-message.interface";
 import { HiveUtils } from "./utils/hive.utils";
+import { MultisigUtils } from "./utils/multisig.utils";
 
 let socket: Socket;
 
@@ -25,7 +31,92 @@ const init = async (): Promise<boolean> => {
     socket.on("disconnect", (ev) => {
       Logger.info("Disconnected from socket");
     });
+
+    socket.on(
+      SocketMessageCommand.REQUEST_SIGN_TRANSACTION,
+      handleRequestSignTransaction
+    );
   });
+};
+
+const handleRequestSignTransaction = async (
+  signatureRequest: ISignatureRequest
+) => {
+  const signer = signatureRequest.signers.find(
+    (signer: RequestSignatureSigner) => {
+      return signer.publicKey === signatureRequest.targetedPublicKey;
+    }
+  );
+
+  if (!signer) {
+    return;
+  } else {
+    let key: string;
+    if (signatureRequest.keyType === KeychainKeyTypes.active) {
+      key = process.env.BOT_ACTIVE_KEY.toString();
+    } else if (signatureRequest.keyType === KeychainKeyTypes.posting) {
+      key = process.env.BOT_POSTING_KEY.toString();
+    }
+
+    const decodedTransaction = await MultisigUtils.decodeTransaction(
+      signer.encryptedTransaction,
+      key
+    );
+
+    console.log(decodedTransaction);
+
+    const transactionUsername =
+      MultisigUtils.getUsernameFromTransaction(decodedTransaction);
+
+    const userConfig = await BotConfigurationLogic.getConfiguration(
+      transactionUsername
+    );
+    if (
+      userConfig.use2FAByDefault &&
+      userConfig.twoFAId &&
+      signer.metaData?.twoFACode
+    ) {
+      if (authenticator.check(signer.metaData.twoFACode, userConfig.twoFAId)) {
+        const signedTransaction = await HiveUtils.signTransaction(
+          decodedTransaction,
+          key
+        );
+
+        if (signedTransaction) {
+          socket.emit(
+            SocketMessageCommand.SIGN_TRANSACTION,
+            {
+              signature:
+                signedTransaction.signatures[
+                  signedTransaction.signatures.length - 1
+                ],
+              signerId: signer.id,
+              signatureRequestId: signatureRequest.id,
+            },
+            async (signatures) => {
+              // Broadcast
+              console.log("should broadcast", signatures);
+              signedTransaction.signatures = signatures;
+              await HiveUtils.getClient().broadcast.send(signedTransaction);
+              socket.emit(
+                SocketMessageCommand.NOTIFY_TRANSACTION_BROADCASTED,
+                { signatureRequestId: signatureRequest.id },
+                () => {
+                  console.log("backend notified of broadcast");
+                }
+              );
+            }
+          );
+        }
+
+        // wait for eventual broadcast request
+
+        HiveUtils;
+      } else {
+        console.log(`OTP couldn't be verified`);
+      }
+    }
+  }
 };
 
 const connectMultisigAccount = async (): Promise<boolean> => {

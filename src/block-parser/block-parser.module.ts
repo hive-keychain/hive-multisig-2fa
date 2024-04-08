@@ -135,7 +135,6 @@ const processTransaction = async (
       const customJson = op[1] as CustomJsonOperation[1];
       switch (customJson.id) {
         case ConfigurationOperations.SET_TWO_FA_ID: {
-          console.log(customJson);
           BotConfigurationLogic.set2FAId(
             customJson.required_auths[0],
             JSON.parse(customJson.json)

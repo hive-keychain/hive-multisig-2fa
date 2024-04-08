@@ -18,19 +18,22 @@ const setConfig = (
 ) => {};
 
 const set2FAId = async (username: string, json: any) => {
-  console.log(json.twoFaId);
-
-  console.log(process.env.BOT_MEMO_KEY.toString());
   const decodedMessage = hive.memo.decode(
     process.env.BOT_MEMO_KEY,
     json.twoFaId.toString()
   );
+
   const twoFaId = decodedMessage.replace("#", "");
 
   await AccountConfigurationRepository.set2FAId(username, twoFaId);
-  console.log(decodedMessage);
 };
 
-const getConfiguration = () => {};
+const getConfiguration = async (username: string) => {
+  return await AccountConfigurationRepository.get(username);
+};
 
-export const BotConfigurationLogic = { createConfig, set2FAId };
+export const BotConfigurationLogic = {
+  createConfig,
+  set2FAId,
+  getConfiguration,
+};

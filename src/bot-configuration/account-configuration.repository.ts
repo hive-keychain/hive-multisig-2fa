@@ -19,4 +19,8 @@ const set2FAId = async (username: string, twoFaId: string) => {
 
 const update = async () => {};
 
-export const AccountConfigurationRepository = { create, update, set2FAId };
+const get = (username: string) => {
+  return getRepo().findOne({ where: { username: username } });
+};
+
+export const AccountConfigurationRepository = { create, update, set2FAId, get };

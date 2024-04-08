@@ -32,6 +32,7 @@ export interface SignerConnectError {
 }
 
 export interface ISignatureRequest {
+  id: number;
   expirationDate: Date;
   threshold: number;
   keyType: KeychainKeyTypes;
@@ -52,9 +53,15 @@ export interface RequestSignatureMessage extends SocketMessagePayload {
 }
 
 export interface RequestSignatureSigner {
+  id: number;
   encryptedTransaction: string; // Encrypted transaction with signer key
   publicKey: string;
   weight: string;
+  metaData?: RequestSignatureSignerMetadata;
+}
+
+export interface RequestSignatureSignerMetadata {
+  twoFACode?: string;
 }
 
 export interface SignTransactionMessage extends SocketMessagePayload {
