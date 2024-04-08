@@ -5,6 +5,7 @@ import Logger from "hive-keychain-commons/lib/logger/logger";
 import { createServer } from "http";
 import https from "https";
 import { BlockParserModule } from "./block-parser/block-parser.module";
+import { AccountConfigurationApi } from "./bot-configuration/account-configuration.api";
 import { Config } from "./config";
 import { MultisigBotDataSource } from "./database/data-source";
 import { DatabaseModule } from "./database/database.module";
@@ -27,6 +28,7 @@ const setupRoutes = (app: Express) => {
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(cors());
+  setupApis(app);
 };
 
 const setupRoutines = async () => {
@@ -37,6 +39,10 @@ const setupRoutines = async () => {
   if (await SocketIoLogic.init()) {
     BlockParserModule.start();
   } else console.log("could not connect");
+};
+
+const setupApis = async (app: Express) => {
+  AccountConfigurationApi.setupApis(app);
 };
 
 const startServer = (app: Express) => {
