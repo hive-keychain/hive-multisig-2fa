@@ -10,6 +10,7 @@ import { Config } from "./config";
 import { MultisigBotDataSource } from "./database/data-source";
 import { DatabaseModule } from "./database/database.module";
 import { SocketIoLogic } from "./socket-io.logic";
+import { BotConfigurationUtils } from "./utils/bot-configuration.utils";
 import { DataUtils } from "./utils/data.utils";
 require("dotenv").config();
 
@@ -19,7 +20,7 @@ const initServerRoutine = async () => {
   const app = express();
   Logger.initLogger(Config.logger, process.env.NODE_ENV);
   setupRoutes(app);
-  // await BotConfigurationUtils.initConfigIfNecessary();
+  await BotConfigurationUtils.initConfigIfNecessary();
   await setupRoutines();
   startServer(app);
 };
