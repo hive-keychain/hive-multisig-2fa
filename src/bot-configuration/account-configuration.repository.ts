@@ -1,3 +1,4 @@
+import { FindOptionsSelect } from "typeorm";
 import { DatabaseModule } from "../database/database.module";
 import { AccountConfiguration } from "../database/entities/account-configuration.entity";
 
@@ -22,7 +23,17 @@ const set2FAId = async (username: string, twoFaId: string) => {
 const update = async () => {};
 
 const get = (username: string) => {
-  return getRepo().findOne({ where: { username: username } });
+  return getRepo().findOne({
+    where: { username: username },
+    select: {
+      id: true,
+      createdAt: true,
+      operationConfigurations: true,
+      updatedAt: true,
+      use2FAByDefault: true,
+      username: true,
+    } as FindOptionsSelect<AccountConfiguration>,
+  });
 };
 
 export const AccountConfigurationRepository = { create, update, set2FAId, get };
