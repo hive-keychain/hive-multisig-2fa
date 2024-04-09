@@ -10,11 +10,13 @@ const create = async (config: Partial<AccountConfiguration>) => {
 };
 
 const set2FAId = async (username: string, twoFaId: string) => {
-  await getRepo().save({
-    username: username,
-    twoFAId: twoFaId,
-    use2FAByDefault: true,
+  const accountConfig = await getRepo().findOne({
+    where: { username: username },
   });
+  if (accountConfig) {
+    accountConfig.twoFAId = twoFaId;
+  }
+  await getRepo().save(accountConfig);
 };
 
 const update = async () => {};
