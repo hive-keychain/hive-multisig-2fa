@@ -42,6 +42,7 @@ const init = async (): Promise<boolean> => {
 const handleRequestSignTransaction = async (
   signatureRequest: ISignatureRequest
 ) => {
+  console.log(signatureRequest);
   const signer = signatureRequest.signers.find(
     (signer: RequestSignatureSigner) => {
       return signer.publicKey === signatureRequest.targetedPublicKey;
@@ -63,20 +64,28 @@ const handleRequestSignTransaction = async (
       key
     );
 
-    console.log(decodedTransaction);
-
     const transactionUsername =
       MultisigUtils.getUsernameFromTransaction(decodedTransaction);
 
-    const userConfig = await BotConfigurationLogic.getConfiguration(
+    const userConfig = await BotConfigurationLogic.getFullConfiguration(
       transactionUsername
     );
-    if (
-      userConfig.use2FAByDefault &&
-      userConfig.twoFAId &&
-      signer.metaData?.twoFACode
-    ) {
-      if (authenticator.check(signer.metaData.twoFACode, userConfig.twoFAId)) {
+    console.log(userConfig);
+
+    console.log(signer);
+
+    const decodedTwoFaCode = await MultisigUtils.decodeMetadata(
+      signer.metaData.twoFACodes[process.env.BOT_ACCOUNT_NAME],
+      key
+    );
+
+    if (userConfig.use2FAByDefault && userConfig.twoFAId && decodedTwoFaCode) {
+      const is2FACorrect = authenticator.check(
+        decodedTwoFaCode,
+        userConfig.twoFAId
+      );
+      console.log({ is2FACorrect });
+      if (is2FACorrect) {
         const signedTransaction = await HiveUtils.signTransaction(
           decodedTransaction,
           key
@@ -111,7 +120,7 @@ const handleRequestSignTransaction = async (
 
         // wait for eventual broadcast request
 
-        HiveUtils;
+        // HiveUtils;
       } else {
         console.log(`OTP couldn't be verified`);
       }

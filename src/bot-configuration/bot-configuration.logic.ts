@@ -31,9 +31,13 @@ const set2FAId = async (username: string, json: any) => {
 const getConfiguration = async (username: string) => {
   return await AccountConfigurationRepository.get(username);
 };
+const getFullConfiguration = async (username: string) => {
+  return await AccountConfigurationRepository.getFull(username);
+};
 
 export const BotConfigurationLogic = {
   createConfig,
   set2FAId,
   getConfiguration,
+  getFullConfiguration,
 };

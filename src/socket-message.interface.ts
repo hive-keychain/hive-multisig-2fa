@@ -61,7 +61,7 @@ export interface RequestSignatureSigner {
 }
 
 export interface RequestSignatureSignerMetadata {
-  twoFACode?: string;
+  twoFACodes?: any;
 }
 
 export interface SignTransactionMessage extends SocketMessagePayload {

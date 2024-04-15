@@ -252,8 +252,25 @@ const decodeTransaction = async (
   }
 };
 
+const decodeMetadata = async (
+  metadata: string,
+  key: string
+): Promise<string> => {
+  if (decodeModule) {
+    try {
+      const decodedMetadata = await decodeModule.decode(key, metadata);
+      const stringifiedTx = decodedMetadata.substring(1);
+      const parsedTx = JSON.parse(stringifiedTx);
+      return parsedTx;
+    } catch (err) {
+      console.error("Error while decoding the metadata", err);
+    }
+  }
+};
+
 export const MultisigUtils = {
   getUsernameFromTransaction,
   decodeTransaction,
   encodeTransaction,
+  decodeMetadata,
 };

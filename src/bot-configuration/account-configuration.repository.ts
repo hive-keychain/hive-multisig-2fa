@@ -36,4 +36,16 @@ const get = (username: string) => {
   });
 };
 
-export const AccountConfigurationRepository = { create, update, set2FAId, get };
+const getFull = (username: string) => {
+  return getRepo().findOne({
+    where: { username: username },
+  });
+};
+
+export const AccountConfigurationRepository = {
+  create,
+  update,
+  set2FAId,
+  get,
+  getFull,
+};
