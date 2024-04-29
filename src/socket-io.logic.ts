@@ -1,3 +1,4 @@
+import * as hive from "@hiveio/hive-js";
 import { KeychainKeyTypes } from "hive-keychain-commons";
 import Logger from "hive-keychain-commons/lib/logger/logger";
 import { authenticator } from "otplib";
@@ -82,7 +83,7 @@ const handleRequestSignTransaction = async (
     if (userConfig.use2FAByDefault && userConfig.twoFAId && decodedTwoFaCode) {
       const is2FACorrect = authenticator.check(
         decodedTwoFaCode,
-        userConfig.twoFAId
+        hive.memo.decode(process.env.BOT_MEMO_KEY, userConfig.twoFAId)
       );
       console.log({ is2FACorrect });
       if (is2FACorrect) {
