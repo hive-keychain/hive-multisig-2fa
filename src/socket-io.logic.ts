@@ -83,7 +83,9 @@ const handleRequestSignTransaction = async (
     if (userConfig.use2FAByDefault && userConfig.twoFAId && decodedTwoFaCode) {
       const is2FACorrect = authenticator.check(
         decodedTwoFaCode,
-        hive.memo.decode(process.env.BOT_MEMO_KEY, userConfig.twoFAId)
+        hive.memo
+          .decode(process.env.BOT_MEMO_KEY, userConfig.twoFAId)
+          .replace("#", "")
       );
       console.log({ is2FACorrect });
       if (is2FACorrect) {
