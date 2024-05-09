@@ -13,7 +13,9 @@ import {
 } from "./socket-message.interface";
 import { HiveUtils } from "./utils/hive.utils";
 import { MultisigUtils } from "./utils/multisig.utils";
-
+authenticator.options = {
+  window: 1,
+};
 let socket: Socket;
 
 const init = async (): Promise<boolean> => {
