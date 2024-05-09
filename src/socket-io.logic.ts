@@ -17,7 +17,6 @@ authenticator.options = {
   window: 1,
 };
 let socket: Socket;
-
 const init = async (): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     Logger.technical(`Initializing socket.io on ${Config.multisigServer}`);
@@ -84,7 +83,7 @@ const handleRequestSignTransaction = async (
 
     if (userConfig.use2FAByDefault && userConfig.twoFAId && decodedTwoFaCode) {
       const is2FACorrect = authenticator.check(
-        decodedTwoFaCode,
+        decodedTwoFaCode.toString(),
         hive.memo
           .decode(process.env.BOT_MEMO_KEY, userConfig.twoFAId)
           .replace("#", "")
