@@ -5,9 +5,8 @@ require("dotenv").config();
 export const Config = {
   port: process.env.PORT || 5001,
   multisigServer:
-    process.env.DEV === "true"
-      ? "http://localhost:5000"
-      : "https://api-multisig.hive-keychain.com",
+    process.env.MULTISIG_BACKEND_URL ||
+    "https://api-multisig.hive-keychain.com",
   logger: {
     folder: path.join(__dirname, "..", "logs"),
     file: "multisig-bot-%DATE%.log",
