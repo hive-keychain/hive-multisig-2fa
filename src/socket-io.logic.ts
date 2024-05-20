@@ -7,6 +7,7 @@ import { BotConfigurationLogic } from "./bot-configuration/bot-configuration.log
 import { Config } from "./config";
 import {
   ISignatureRequest,
+  MultisigErrorMessage,
   RequestSignatureSigner,
   SignerConnectMessage,
   SocketMessageCommand,
@@ -131,6 +132,13 @@ const handleRequestSignTransaction = async (
         // HiveUtils;
       } else {
         console.log(`OTP couldn't be verified`);
+        socket.emit(SocketMessageCommand.SEND_BACK_ERROR, {
+          signatureRequestId: signatureRequest.id,
+          error: {
+            fullMessage: "OPT couldn't be verified",
+            message: "error_otp_not_verified",
+          },
+        } as MultisigErrorMessage);
       }
     }
   }
