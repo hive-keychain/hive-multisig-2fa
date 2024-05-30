@@ -73,10 +73,8 @@ const handleRequestSignTransaction = async (
     const userConfig = await BotConfigurationLogic.getFullConfiguration(
       transactionUsername
     );
-    console.log(userConfig);
 
-    console.log(signer);
-
+    if (!signer || !signer.metaData || !signer.metaData.twoFACodes) return;
     const decodedTwoFaCode = await MultisigUtils.decodeMetadata(
       signer.metaData.twoFACodes[process.env.BOT_ACCOUNT_NAME],
       key
