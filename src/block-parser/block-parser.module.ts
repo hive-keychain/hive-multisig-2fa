@@ -107,7 +107,7 @@ const getNextBlock = async () => {
 };
 
 const processBlock = async (block: SignedBlock) => {
-  Logger.debug(`processing block #${currentBlock}`);
+  // Logger.debug(`processing block #${currentBlock}`);
 
   const lastTransactionAttempted = 0;
   for (

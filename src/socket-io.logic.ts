@@ -18,6 +18,36 @@ authenticator.options = {
   window: 1,
 };
 let socket: Socket;
+
+const rateLimitingArray: { [id: string]: number } = {};
+
+const checkRateLimiting = (id: string) => {
+  if (!rateLimitingArray[id]) {
+    rateLimitingArray[id] = 0;
+  }
+
+  if (rateLimitingArray[id] === 2) {
+    console.log("rate limiting reached");
+    return false;
+  } else {
+    rateLimitingArray[id] = rateLimitingArray[id] + 1;
+    setTimeout(() => {
+      removeFromRateLimiting(id);
+    }, 30000);
+    console.log("return true", rateLimitingArray);
+    return true;
+  }
+};
+
+const removeFromRateLimiting = (id: string) => {
+  if (rateLimitingArray[id] > 1) {
+    rateLimitingArray[id] = rateLimitingArray[id] - 1;
+  } else if (rateLimitingArray[id] === 1) {
+    delete rateLimitingArray[id];
+  }
+  console.log("removing", rateLimitingArray);
+};
+
 const init = async (): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     Logger.technical(`Initializing socket.io on ${Config.multisigServer}`);
@@ -45,7 +75,7 @@ const init = async (): Promise<boolean> => {
 const handleRequestSignTransaction = async (
   signatureRequest: ISignatureRequest
 ) => {
-  console.log(signatureRequest);
+  // console.log(signatureRequest);
   const signer = signatureRequest.signers.find(
     (signer: RequestSignatureSigner) => {
       return signer.publicKey === signatureRequest.targetedPublicKey;
@@ -81,6 +111,17 @@ const handleRequestSignTransaction = async (
     );
 
     if (userConfig.use2FAByDefault && userConfig.twoFAId && decodedTwoFaCode) {
+      if (!checkRateLimiting(userConfig.twoFAId)) {
+        socket.emit(SocketMessageCommand.SEND_BACK_ERROR, {
+          signatureRequestId: signatureRequest.id,
+          error: {
+            fullMessage: "Rate limiting reached. Try again later",
+            message: "error_rate_limiting_reached",
+          },
+        } as MultisigErrorMessage);
+        return;
+      }
+
       const is2FACorrect = authenticator.check(
         decodedTwoFaCode.toString(),
         hive.memo
