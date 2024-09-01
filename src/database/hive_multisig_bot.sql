@@ -33,30 +33,6 @@ CREATE TABLE `migrations` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE `operation-configuration` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `operation` varchar(255) NOT NULL,
-  `isUsing2FA` tinyint(4) NOT NULL,
-  `createdAt` timestamp(6) NOT NULL DEFAULT current_timestamp(6),
-  `updatedAt` timestamp(6) NOT NULL DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
-  `accountConfigurationId` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `FK_9cc651bc45e344e8308d5903863` (`accountConfigurationId`),
-  CONSTRAINT `FK_9cc651bc45e344e8308d5903863` FOREIGN KEY (`accountConfigurationId`) REFERENCES `account-configuration` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-CREATE TABLE `operation-criteria` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `operationField` varchar(255) NOT NULL,
-  `operand` enum('==','!=','>','>=','<','<=') NOT NULL,
-  `value` varchar(255) NOT NULL,
-  `operationConfigurationId` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `FK_593123e74a5748457441476c503` (`operationConfigurationId`),
-  CONSTRAINT `FK_593123e74a5748457441476c503` FOREIGN KEY (`operationConfigurationId`) REFERENCES `operation-configuration` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

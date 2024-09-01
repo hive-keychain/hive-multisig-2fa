@@ -2,11 +2,9 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { OperationConfiguration } from "./operation-configuration.entity";
 
 @Entity({ name: "account-configuration" })
 export class AccountConfiguration {
@@ -34,12 +32,6 @@ export class AccountConfiguration {
     onUpdate: "CURRENT_TIMESTAMP(6)",
   })
   updatedAt: Date;
-
-  @OneToMany(
-    () => OperationConfiguration,
-    (operationConfiguration) => operationConfiguration.accountConfiguration
-  )
-  operationConfigurations: OperationConfiguration[];
 
   constructor(obj: Partial<AccountConfiguration>) {
     if (!obj) return;
