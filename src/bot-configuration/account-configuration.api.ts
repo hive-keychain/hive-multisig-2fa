@@ -15,8 +15,15 @@ const setupGetByAccountName = (app: Express) => {
   });
 };
 
+const setupHealthCheck = (app: Express) => {
+  app.get(`/health`, async (req, res) => {
+    res.sendStatus(200);
+  });
+};
+
 const setupApis = (app: Express) => {
   setupGetByAccountName(app);
+  setupHealthCheck(app);
 };
 
 export const AccountConfigurationApi = { setupApis };

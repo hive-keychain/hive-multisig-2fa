@@ -22,6 +22,8 @@ const initServerRoutine = async () => {
   setupRoutes(app);
   await BotConfigurationUtils.initConfigIfNecessary();
   await setupRoutines();
+  console.log("here");
+
   startServer(app);
 };
 
