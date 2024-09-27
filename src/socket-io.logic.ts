@@ -151,10 +151,12 @@ const handleRequestSignTransaction = async (
               console.log("should broadcast", signatures);
               signedTransaction.signatures = signatures;
               try {
-                await HiveUtils.getClient().broadcast.send(signedTransaction);
+                const result = await HiveUtils.getClient().broadcast.send(
+                  signedTransaction
+                );
                 socket.emit(
                   SocketMessageCommand.NOTIFY_TRANSACTION_BROADCASTED,
-                  { signatureRequestId: signatureRequest.id },
+                  { signatureRequestId: signatureRequest.id, txId: result.id },
                   () => {
                     console.log("backend notified of broadcast");
                   }
