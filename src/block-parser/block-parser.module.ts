@@ -109,7 +109,10 @@ const getNextBlock = async () => {
 const processBlock = async (block: SignedBlock) => {
   // Logger.debug(`processing block #${currentBlock}`);
 
+  const lastBlockInfo = await DataUtils.getLayer1BlockInfo();
+
   const lastTransactionAttempted = 0;
+
   for (
     let i = lastTransactionAttempted ? lastTransactionAttempted : 0;
     i < block.transactions.length;

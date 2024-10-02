@@ -20,6 +20,7 @@ authenticator.options = {
 let socket: Socket;
 
 const rateLimitingArray: { [id: string]: number } = {};
+const usedOtp: { [id: string]: string[] } = {};
 
 const checkRateLimiting = (id: string) => {
   if (!rateLimitingArray[id]) {
@@ -37,6 +38,22 @@ const checkRateLimiting = (id: string) => {
     console.log("return true", rateLimitingArray);
     return true;
   }
+};
+
+const checkUsedOtp = (id: string, otp: string) => {
+  if (!usedOtp[id]) usedOtp[id] = [];
+
+  if (usedOtp[id].includes(otp)) {
+    console.log("OTP already used");
+    return false;
+  }
+
+  usedOtp[id].push(otp);
+
+  setTimeout(() => {
+    usedOtp[id] = usedOtp[id].filter((o) => o !== otp);
+  }, 60000);
+  return true;
 };
 
 const removeFromRateLimiting = (id: string) => {
@@ -110,6 +127,16 @@ const handleRequestSignTransaction = async (
       key
     );
 
+    if (!decodedTwoFaCode || decodedTwoFaCode.length === 0) {
+      socket.emit(SocketMessageCommand.SEND_BACK_ERROR, {
+        signatureRequestId: signatureRequest.id,
+        error: {
+          fullMessage: "OPT couldn't be verified",
+          message: "error_otp_not_verified",
+        },
+      } as MultisigErrorMessage);
+    }
+
     if (userConfig.use2FAByDefault && userConfig.twoFAId && decodedTwoFaCode) {
       if (!checkRateLimiting(userConfig.twoFAId)) {
         socket.emit(SocketMessageCommand.SEND_BACK_ERROR, {
@@ -117,6 +144,17 @@ const handleRequestSignTransaction = async (
           error: {
             fullMessage: "Rate limiting reached. Try again later",
             message: "error_rate_limiting_reached",
+          },
+        } as MultisigErrorMessage);
+        return;
+      }
+
+      if (!checkUsedOtp(userConfig.twoFAId, decodedTwoFaCode)) {
+        socket.emit(SocketMessageCommand.SEND_BACK_ERROR, {
+          signatureRequestId: signatureRequest.id,
+          error: {
+            fullMessage: "OTP already used",
+            message: "error_otp_already_used",
           },
         } as MultisigErrorMessage);
         return;
