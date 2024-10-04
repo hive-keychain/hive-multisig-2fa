@@ -135,6 +135,7 @@ const handleRequestSignTransaction = async (
           message: "error_otp_not_verified",
         },
       } as MultisigErrorMessage);
+      return;
     }
 
     if (userConfig.use2FAByDefault && userConfig.twoFAId && decodedTwoFaCode) {
