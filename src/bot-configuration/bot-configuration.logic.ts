@@ -18,7 +18,6 @@ const setConfig = (
 ) => {};
 
 const set2FAId = async (username: string, json: any) => {
-  console.log(process.env.BOT_ACTIVE_KEY, json.twoFaId.toString());
   const decodedMessage = hive.memo.decode(
     process.env.BOT_MEMO_KEY,
     json.twoFaId.toString()

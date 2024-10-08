@@ -87,6 +87,7 @@ const getNextBlock = async () => {
     }
 
     await processBlock(block);
+    await DataUtils.saveLayer1BlockInfo({ lastBlock: currentBlock });
     nbBlocksProcessed++;
     const duration = Date.now() - start;
 
